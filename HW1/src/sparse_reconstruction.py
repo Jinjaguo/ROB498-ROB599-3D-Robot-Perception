@@ -132,12 +132,12 @@ def visualize(point_cloud):
 
 
 if __name__ == "__main__":
-    data_for_fundamental_matrix = np.load("data/corresp_subset.npz")
+    data_for_fundamental_matrix = np.load("./data/corresp_subset.npz")
     pts1_for_fundamental_matrix = data_for_fundamental_matrix['pts1']
     pts2_for_fundamental_matrix = data_for_fundamental_matrix['pts2']
 
-    img1 = cv2.imread('data/im1.png')
-    img2 = cv2.imread('data/im2.png')
+    img1 = cv2.imread('./data/im1.png')
+    img2 = cv2.imread('./data/im2.png')
     scale = max(img1.shape)
     
 
