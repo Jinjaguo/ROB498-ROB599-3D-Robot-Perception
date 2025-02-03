@@ -299,4 +299,4 @@ if __name__ == "__main__":
     pts2_normalized = pts2_normalized.T
 
     point_cloud, point_cloud_cv = triangulate_points(E, pts1_normalized, pts2_normalized)
-    visualize(point_cloud)
+    visualize(point_cloud_cv)
