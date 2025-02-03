@@ -41,7 +41,7 @@ def epipolar_lines_GUI_tool(I1, I2, F):
         s = np.sqrt(l[0]**2+l[1]**2)
 
         if s==0:
-            error('Zero line vector in displayEpipolar')
+            raise Exception('Zero line vector in displayEpipolar')
 
         l = l / s
         if l[1] != 0:
@@ -84,7 +84,7 @@ def epipolar_correspondences_GUI_tool(I1, I2, F):
         s = np.sqrt(l[0]**2+l[1]**2)
 
         if s==0:
-            error('Zero line vector in displayEpipolar')
+            raise Exception('Zero line vector in displayEpipolar')
 
         l = l / s
         if l[0] != 0:
