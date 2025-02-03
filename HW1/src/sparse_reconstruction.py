@@ -32,7 +32,8 @@ def compute_fundamental_matrix(pts1, pts2, scale):
     for i in range(pts1_normalized.shape[0]):
         x, y = pts1_normalized[i]
         u, v = pts2_normalized[i]
-        A.append([x * u, x * v, x, v * y, -y * v, y, u, v, 1])
+        A.append([x * u, x * v, x, y * u, y * v, y, u, v, 1])
+
     A = np.array(A)
 
     # Compute the SVD of A to get the Fundamental matrix
@@ -223,8 +224,8 @@ def triangulate_points(E, pts1_ep, pts2_ep):
 
     point_cloud = np.array(best_points)  # Nx3
 
-    pts1_h = pts1_ep.T.astype(np.float32)  # 2 x N
-    pts2_h = pts2_ep.T.astype(np.float32)  # 2 x N
+    pts1_h = pts1_normalized[:, :2].T.astype(np.float32)
+    pts2_h = pts2_normalized[:, :2].T.astype(np.float32)  # (2, N)
     P1_cv = P1.astype(np.float32)
     P2_cv = best_P2.astype(np.float32)
     pts4D = cv2.triangulatePoints(P1_cv, P2_cv, pts1_h, pts2_h)  # 4 x N
@@ -280,11 +281,22 @@ if __name__ == "__main__":
     # Compute the Fundamental matrix
     F = compute_fundamental_matrix(pts1_for_fundamental_matrix, pts2_for_fundamental_matrix, scale)
     print("Computed Fundamental Matrix:\n", F)
-    _helper.epipolar_lines_GUI_tool(img1_rgb, img2_rgb, F)
-    _helper.epipolar_correspondences_GUI_tool(img1_rgb, img2_rgb, F)
+    # _helper.epipolar_lines_GUI_tool(img1_rgb, img2_rgb, F)
+    # _helper.epipolar_correspondences_GUI_tool(img1_rgb, img2_rgb, F)
 
     E = compute_essential_matrix(K1, K2, F)
-    pts1_normalized = np.linalg.inv(K1) @ pts1_for_fundamental_matrix
-    pts2_normalized = np.linalg.inv(K2) @ pts2_for_fundamental_matrix
+    N = pts1_for_fundamental_matrix.shape[0]
+    pts1_hom = np.hstack([pts1_for_fundamental_matrix, np.ones((N, 1))])  # (N, 3)
+    pts2_hom = np.hstack([pts2_for_fundamental_matrix, np.ones((N, 1))])  # (N, 3)
 
-    triangulate_points(E, pts1_normalized, pts2_normalized)
+    pts1_hom_T = pts1_hom.T  # (3, N)
+    pts2_hom_T = pts2_hom.T  # (3, N)
+
+    pts1_normalized = np.linalg.inv(K1) @ pts1_hom_T  # (3, N)
+    pts2_normalized = np.linalg.inv(K2) @ pts2_hom_T  # (3, N)
+
+    pts1_normalized = pts1_normalized.T
+    pts2_normalized = pts2_normalized.T
+
+    point_cloud, point_cloud_cv = triangulate_points(E, pts1_normalized, pts2_normalized)
+    visualize(point_cloud)
