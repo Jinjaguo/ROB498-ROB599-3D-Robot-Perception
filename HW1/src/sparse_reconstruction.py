@@ -91,8 +91,9 @@ def compute_epipolar_correspondences(img1, img2, pts1, F):
             continue
         template = img1[y_int - half_win: y_int + half_win + 1, x_int - half_win: x_int + half_win + 1]
 
+        min_cost = float('inf')
         best_point = None
-        search_range = 30
+        search_range = 20
         # Find the epipolar line in Image 2 that intersects the template
         for u in range(max(0, x_int - search_range), min(img2.shape[1], x_int + search_range)):
             if abs(l_[1]) < 1e-6:
@@ -108,13 +109,15 @@ def compute_epipolar_correspondences(img1, img2, pts1, F):
             candidate = img2[v_int - half_win: v_int + half_win + 1, u - half_win: u + half_win + 1]
 
             cost = np.sum(np.abs(candidate.astype(np.float32) - template.astype(np.float32)))
-            if cost < float('inf'):
+            if cost < min_cost:
+                min_cost = cost
                 best_point = (u, v_int)
 
         if best_point is None:
             best_point = (0, 0)
         pts2_ep.append(best_point)
-        pts2_ep = np.array(pts2_ep)
+
+    pts2_ep = np.array(pts2_ep)
     return pts2_ep
 
 
@@ -224,8 +227,8 @@ def triangulate_points(E, pts1_ep, pts2_ep):
 
     point_cloud = np.array(best_points)  # Nx3
 
-    pts1_h = pts1_normalized[:, :2].T.astype(np.float32)
-    pts2_h = pts2_normalized[:, :2].T.astype(np.float32)  # (2, N)
+    pts1_h = pts1_ep[:, :2].T.astype(np.float32)
+    pts2_h = pts2_ep[:, :2].T.astype(np.float32)  # (2, N)
     P1_cv = P1.astype(np.float32)
     P2_cv = best_P2.astype(np.float32)
     pts4D = cv2.triangulatePoints(P1_cv, P2_cv, pts1_h, pts2_h)  # 4 x N
@@ -281,6 +284,9 @@ if __name__ == "__main__":
     # Compute the Fundamental matrix
     F = compute_fundamental_matrix(pts1_for_fundamental_matrix, pts2_for_fundamental_matrix, scale)
     print("Computed Fundamental Matrix:\n", F)
+
+    # Use the GUI tool to visualize the epipolar lines and epipolar correspondences
+    # uncomment the following lines to use the GUI tool
     # _helper.epipolar_lines_GUI_tool(img1_rgb, img2_rgb, F)
     # _helper.epipolar_correspondences_GUI_tool(img1_rgb, img2_rgb, F)
 
@@ -292,11 +298,13 @@ if __name__ == "__main__":
     pts1_hom_T = pts1_hom.T  # (3, N)
     pts2_hom_T = pts2_hom.T  # (3, N)
 
-    pts1_normalized = np.linalg.inv(K1) @ pts1_hom_T  # (3, N)
+    pts1_normalized = np.linalg.inv(K1) @ pts1_hom_T  # (3, N)s
     pts2_normalized = np.linalg.inv(K2) @ pts2_hom_T  # (3, N)
 
     pts1_normalized = pts1_normalized.T
     pts2_normalized = pts2_normalized.T
 
     point_cloud, point_cloud_cv = triangulate_points(E, pts1_normalized, pts2_normalized)
-    visualize(point_cloud_cv)
+    # comment the previous GUI line to see point cloud visualization.
+    visualize(point_cloud)
+    # visualize(point_cloud_cv)
