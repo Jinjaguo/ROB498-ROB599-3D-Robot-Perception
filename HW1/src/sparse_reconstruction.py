@@ -25,16 +25,19 @@ def compute_fundamental_matrix(pts1, pts2, scale):
     Returns:
     F (numpy.ndarray): A 3x3 Fundamental matrix
     """
+    T = np.array([[1 / scale, 0, 0],
+                  [0, 1 / scale, 0],
+                  [0, 0, 1]])
     pts1_normalized = pts1 / scale
     pts2_normalized = pts2 / scale
-    A = []
+    A = np.empty((pts1.shape[0], 9))
     # Create the A matrix for the linear system Ax = 0
-    for i in range(pts1_normalized.shape[0]):
-        x, y = pts1_normalized[i]
-        u, v = pts2_normalized[i]
-        A.append([x * u, x * v, x, y * u, y * v, y, u, v, 1])
-
-    A = np.array(A)
+    x1 = pts1_normalized[:, 0]
+    y1 = pts1_normalized[:, 1]
+    x2 = pts2_normalized[:, 0]
+    y2 = pts2_normalized[:, 1]
+    A = np.vstack((x2 * x1, x2 * y1, x2, y2 * x1, y2 * y1,
+                   y2, x1, y1, np.ones(pts1.shape[0]))).T
 
     # Compute the SVD of A to get the Fundamental matrix
     U, S, V = np.linalg.svd(A)
@@ -42,15 +45,11 @@ def compute_fundamental_matrix(pts1, pts2, scale):
 
     # Make sure F is rank 2
     U, S, V = np.linalg.svd(F)
-    S = np.diag(S)
-    S[-1, -1] = 0
-    F = np.dot(U, np.dot(S, V))
+    S[-1] = 0
+    F = U.dot(np.diag(S).dot(V))
 
     # Scale the Fundamental matrix to match the original image size
-    T = np.array([[1 / scale, 0, 0],
-                  [0, 1 / scale, 0],
-                  [0, 0, 1]])
-    F = T.T @ F @ T
+    F = np.dot((np.dot(T.T, F)), T)
 
     return F
 
@@ -108,7 +107,8 @@ def compute_epipolar_correspondences(img1, img2, pts1, F):
 
             candidate = img2[v_int - half_win: v_int + half_win + 1, u - half_win: u + half_win + 1]
 
-            cost = np.sum(np.abs(candidate.astype(np.float32) - template.astype(np.float32)))
+            # cost = np.sum(np.abs(candidate.astype(np.float32) - template.astype(np.float32)))
+            cost = np.sum((candidate - template) ** 2)
             if cost < min_cost:
                 min_cost = cost
                 best_point = (u, v_int)
@@ -138,7 +138,7 @@ def compute_essential_matrix(K1, K2, F):
                    the two cameras.
 
     """
-    E = np.dot(K2.T, np.dot(F, K1))
+    E = np.dot((np.dot(K2.T, F)), K1)
 
     return E
 
@@ -268,11 +268,9 @@ if __name__ == "__main__":
     pts1_for_fundamental_matrix = data_for_fundamental_matrix['pts1']
     pts2_for_fundamental_matrix = data_for_fundamental_matrix['pts2']
 
-    img1 = cv2.imread('./data/im1.png')
-    img2 = cv2.imread('./data/im2.png')
-    scale = max(img1.shape)
-    img1_rgb = cv2.cvtColor(img1, cv2.COLOR_BGR2RGB)
-    img2_rgb = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
+    img1 = plt.imread('./data/im1.png')
+    img2 = plt.imread('./data/im2.png')
+    scale = np.max(img1.shape)
 
     data_for_temple = np.load("data/temple_coords.npz")
     pts1_epipolar = data_for_temple['pts1']
@@ -287,24 +285,54 @@ if __name__ == "__main__":
 
     # Use the GUI tool to visualize the epipolar lines and epipolar correspondences
     # uncomment the following lines to use the GUI tool
-    # _helper.epipolar_lines_GUI_tool(img1_rgb, img2_rgb, F)
-    # _helper.epipolar_correspondences_GUI_tool(img1_rgb, img2_rgb, F)
+    # _helper.epipolar_lines_GUI_tool(img1, img2, F)
+    # _helper.epipolar_correspondences_GUI_tool(img1, img2, F)
 
     E = compute_essential_matrix(K1, K2, F)
-    N = pts1_for_fundamental_matrix.shape[0]
-    pts1_hom = np.hstack([pts1_for_fundamental_matrix, np.ones((N, 1))])  # (N, 3)
-    pts2_hom = np.hstack([pts2_for_fundamental_matrix, np.ones((N, 1))])  # (N, 3)
+    print("Computed Essential Matrix:\n", E)
+
+    N = pts1_epipolar.shape[0]
+    pts2_epipolar = compute_epipolar_correspondences(img1, img2, pts1_epipolar, F)
+
+    ################################################################################
+    N1 = pts1_epipolar.shape[0]
+    colors1 = plt.cm.jet(np.linspace(0, 1, N1))
+
+    N2 = pts2_epipolar.shape[0]
+    colors2 = plt.cm.jet(np.linspace(0, 1, N2))
+
+    fig, axes = plt.subplots(1, 2, figsize=(12, 6))
+    # show the original images and points
+    axes[0].imshow(img1)
+    axes[0].scatter(pts1_epipolar[:, 0], pts1_epipolar[:, 1],
+                    c=colors1, s=40, marker='o')
+    axes[0].set_title("Image 1")
+    axes[0].axis('off')
+
+    # show the epipolar lines and epipolar correspondences
+    axes[1].imshow(img2)
+    axes[1].scatter(pts2_epipolar[:, 0], pts2_epipolar[:, 1],
+                    c=colors2, s=40, marker='o')
+    axes[1].set_title("Image 2")
+    axes[1].axis('off')
+
+    plt.tight_layout()
+    plt.show()
+    ################################################################################
+
+    pts1_hom = np.hstack([pts1_epipolar, np.ones((N, 1))])  # (N, 3)
+    pts2_hom = np.hstack([pts2_epipolar, np.ones((N, 1))])  # (N, 3)
 
     pts1_hom_T = pts1_hom.T  # (3, N)
     pts2_hom_T = pts2_hom.T  # (3, N)
 
-    pts1_normalized = np.linalg.inv(K1) @ pts1_hom_T  # (3, N)s
-    pts2_normalized = np.linalg.inv(K2) @ pts2_hom_T  # (3, N)
+    pts1_normalized = np.dot(np.linalg.inv(K1), pts1_hom_T).T  # (N, 3)
+    pts2_normalized = np.dot(np.linalg.inv(K2), pts2_hom_T).T  # (N, 3)
 
-    pts1_normalized = pts1_normalized.T
-    pts2_normalized = pts2_normalized.T
+    pts1_normalized = pts1_normalized[:, :2] # (N, 2)
+    pts2_normalized = pts2_normalized[:, :2] # (N, 2)
 
     point_cloud, point_cloud_cv = triangulate_points(E, pts1_normalized, pts2_normalized)
     # comment the previous GUI line to see point cloud visualization.
-    visualize(point_cloud)
+    visualize(point_cloud_cv)
     # visualize(point_cloud_cv)
