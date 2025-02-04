@@ -284,9 +284,10 @@ if __name__ == "__main__":
     print("Computed Fundamental Matrix:\n", F)
 
     # Use the GUI tool to visualize the epipolar lines and epipolar correspondences
+
     # uncomment the following lines to use the GUI tool
     # _helper.epipolar_lines_GUI_tool(img1, img2, F)
-    # _helper.epipolar_correspondences_GUI_tool(img1, img2, F)
+    _helper.epipolar_correspondences_GUI_tool(img1, img2, F)
 
     E = compute_essential_matrix(K1, K2, F)
     print("Computed Essential Matrix:\n", E)
@@ -295,6 +296,8 @@ if __name__ == "__main__":
     pts2_epipolar = compute_epipolar_correspondences(img1, img2, pts1_epipolar, F)
 
     ################################################################################
+    # Here we will visualize the epipolar lines and epipolar correspondences
+
     N1 = pts1_epipolar.shape[0]
     colors1 = plt.cm.jet(np.linspace(0, 1, N1))
 
@@ -306,33 +309,37 @@ if __name__ == "__main__":
     axes[0].imshow(img1)
     axes[0].scatter(pts1_epipolar[:, 0], pts1_epipolar[:, 1],
                     c=colors1, s=40, marker='o')
-    axes[0].set_title("Image 1")
+    axes[0].set_title("Points in Image 1")
     axes[0].axis('off')
 
     # show the epipolar lines and epipolar correspondences
     axes[1].imshow(img2)
     axes[1].scatter(pts2_epipolar[:, 0], pts2_epipolar[:, 1],
                     c=colors2, s=40, marker='o')
-    axes[1].set_title("Image 2")
+    axes[1].set_title("Corresponding points in Image 2")
     axes[1].axis('off')
 
     plt.tight_layout()
     plt.show()
     ################################################################################
 
+    # here we get the homogeneous coordinates of the points
     pts1_hom = np.hstack([pts1_epipolar, np.ones((N, 1))])  # (N, 3)
     pts2_hom = np.hstack([pts2_epipolar, np.ones((N, 1))])  # (N, 3)
 
     pts1_hom_T = pts1_hom.T  # (3, N)
     pts2_hom_T = pts2_hom.T  # (3, N)
 
+    # normalize the points by using intrinsic matrices
     pts1_normalized = np.dot(np.linalg.inv(K1), pts1_hom_T).T  # (N, 3)
     pts2_normalized = np.dot(np.linalg.inv(K2), pts2_hom_T).T  # (N, 3)
 
-    pts1_normalized = pts1_normalized[:, :2] # (N, 2)
-    pts2_normalized = pts2_normalized[:, :2] # (N, 2)
+    # Here we need N,2 as input for triangulatePoints()
+    pts1_normalized = pts1_normalized[:, :2]  # (N, 2)
+    pts2_normalized = pts2_normalized[:, :2]  # (N, 2)
 
     point_cloud, point_cloud_cv = triangulate_points(E, pts1_normalized, pts2_normalized)
     # comment the previous GUI line to see point cloud visualization.
-    visualize(point_cloud_cv)
+
+    visualize(point_cloud)
     # visualize(point_cloud_cv)
