@@ -37,7 +37,7 @@ def calculate_projection(pts2d, pts3d):
     U, S, Vt = np.linalg.svd(A)
 
     # The last column of Vt is the right singular vector corresponding to the smallest
-    V = Vt[:, -1]
+    V = Vt[-1, :]
     M = np.reshape(V, (3, 4))
 
     # Normalize the M matrix to obtain a unitary matrix

@@ -287,7 +287,7 @@ if __name__ == "__main__":
 
     # uncomment the following lines to use the GUI tool
     # _helper.epipolar_lines_GUI_tool(img1, img2, F)
-    _helper.epipolar_correspondences_GUI_tool(img1, img2, F)
+    # _helper.epipolar_correspondences_GUI_tool(img1, img2, F)
 
     E = compute_essential_matrix(K1, K2, F)
     print("Computed Essential Matrix:\n", E)
