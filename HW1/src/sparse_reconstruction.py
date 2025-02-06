@@ -235,6 +235,9 @@ def triangulate_points(E, pts1_ep, pts2_ep):
     pts4D = pts4D / pts4D[3, :]
     point_cloud_cv = pts4D[:3, :].T  # N x 3
 
+    error = np.mean(np.linalg.norm(point_cloud - point_cloud_cv))
+
+    print('error: ', error)
     print("Triangulated 3D points (custom linear triangulation):\n", point_cloud)
     print("Triangulated 3D points (cv2.triangulatePoints):\n", point_cloud_cv)
     return point_cloud, point_cloud_cv
@@ -287,7 +290,7 @@ if __name__ == "__main__":
 
     # uncomment the following lines to use the GUI tool
     # _helper.epipolar_lines_GUI_tool(img1, img2, F)
-    _helper.epipolar_correspondences_GUI_tool(img1, img2, F)
+    # _helper.epipolar_correspondences_GUI_tool(img1, img2, F)
 
     E = compute_essential_matrix(K1, K2, F)
     print("Computed Essential Matrix:\n", E)
