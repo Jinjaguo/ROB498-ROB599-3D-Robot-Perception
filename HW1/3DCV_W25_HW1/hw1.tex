@@ -22,7 +22,7 @@
 \def\captionfonts{{\em}}
 \makeatletter  % Allow the use of @ in command names
 \setlength{\abovecaptionskip}{0.3ex plus 0.3ex minus 0.3ex}
-\setlength{\belowcaptionskip}{0.3ex plus 0.3ex minus 0.3ex}
+\setlength{\belowcaptionskip}{0.3ex plus 0.3ex minus 0.3ex} 
 \long\def\@makecaption#1#2{%
   \vskip\abovecaptionskip
   \sbox\@tempboxa{{\captionfonts #1: #2}}%
@@ -105,8 +105,8 @@
 \questionhaspoints{0=0,1=20,2=20,3=20,4=10,5=20,6=10}
 
 
-\noindent\textbf{Instructions: }
-Each bullet point in this template contains the prompt for what information should be included in the write up. Replace the bullet point with your own answer to the question/prompt described in the bullet point. Finally, submit a \texttt{.zip} file containing this write-up and a folder \texttt{scripts} with all the python scripts on Canvas.
+\noindent\textbf{Instructions: } 
+Each bullet point in this template contains the prompt for what information should be included in the write up. Replace the bullet point with your own answer to the question/prompt described in the bullet point. Finally, submit a \texttt{.zip} file containing this write-up and a folder \texttt{scripts} with all the python scripts on Canvas. 
 
 \addtocounter{problemnumber}{1}
 \noindent\textbf{Problem \arabic{problemnumber}}: Camera Calibration
@@ -123,7 +123,7 @@ M=\begin{bmatrix}
 \label{eq:projection_matrix}
 \end{align}
 
-\textbf{Answer:}
+\textbf{Answer:}  
 
 We follow the direct linear transformation (DLT) method to calculate the projection matrix.
 The function {\tt  calculate\_projection(pts2d, pts3d} calculates the $3×4$ projection matrix M using a set of corresponding 2D image points and 3D world points.
@@ -147,7 +147,7 @@ ii. In this paragraph, describe your reprojection error results. What does this 
 errror_{reprojection}=0.00222745 \label{eq:reprojection_error}
 \end{equation}
 
-\textbf{Answer:}
+\textbf{Answer:}  
 
 The reprojection error calculated in the code represents the average Euclidean distance between the actual 2D image point and the projected 2D point obtained using the estimated projection matrix. The reprojection error is in pixels because it measures the difference between coordinates in image space.
 
@@ -169,9 +169,9 @@ i. Briefly discuss the fundamental matrix - what does it actually represent, and
 
 \begin{align}
 F = \begin{bmatrix}
-\multicolumn{1}{c}{3.5648 \times 10^{-9}} & \multicolumn{1}{c}{-5.9210 \times 10^{-8}} & \multicolumn{1}{c}{-1.6500 \times 10^{-5}} \\
-\multicolumn{1}{c}{-1.3080 \times 10^{-7}} & \multicolumn{1}{c}{-1.3110 \times 10^{-9}} & \multicolumn{1}{c}{1.1240 \times 10^{-3}} \\
-\multicolumn{1}{c}{3.0470 \times 10^{-5}}  & \multicolumn{1}{c}{-1.0800 \times 10^{-9}} & \multicolumn{1}{c}{-4.1650 \times 10^{-3}} \\
+\multicolumn{1}{c}{3.5648 \times 10^{-9}} & \multicolumn{1}{c}{-5.9210 \times 10^{-8}} & \multicolumn{1}{c}{-1.6500 \times 10^{-5}} \\ 
+\multicolumn{1}{c}{-1.3080 \times 10^{-7}} & \multicolumn{1}{c}{-1.3110 \times 10^{-9}} & \multicolumn{1}{c}{1.1240 \times 10^{-3}} \\ 
+\multicolumn{1}{c}{3.0470 \times 10^{-5}}  & \multicolumn{1}{c}{-1.0800 \times 10^{-9}} & \multicolumn{1}{c}{-4.1650 \times 10^{-3}} \\ 
 \end{bmatrix}
 \label{eq:fundamental_matrix}
 \end{align}
@@ -277,15 +277,15 @@ i. Discuss the essential matrix calculation. Briefly discuss the equation/deriva
 
 The fundamental matrix E is a special case of $F$. When the phase plane is normalized, we have $E=F$
 $F$ be the fundamental matrix.
-$K_1$ and $K_2$ be the $3x3$ camera intrinsic matrices for the first and second cameras, respectively.
+$K_1$ and $K_2$ be the $3x3$ camera intrinsic matrices for the first and second cameras, respectively. 
 $E$ be the essential matrix.
 $$E = K_2^T * F * K_1$$
 
 \begin{align}
 E = \begin{bmatrix}
-\multicolumn{1}{c}{8.240 \times 10^{-3}} & \multicolumn{1}{c}{-1.374 \times 10^{-1}} & \multicolumn{1}{c}{-4.568 \times 10^{-2}} \\
-\multicolumn{1}{c}{-3.035 \times 10^{-1}} & \multicolumn{1}{c}{-3.052 \times 10^{-3}} & \multicolumn{1}{c}{1.655 \times 10^{0}} \\
-\multicolumn{1}{c}{-1.129 \times 10^{-3}}  & \multicolumn{1}{c}{-1.676 \times 10^{0}} & \multicolumn{1}{c}{-2.873 \times 10^{-3}} \\
+\multicolumn{1}{c}{8.240 \times 10^{-3}} & \multicolumn{1}{c}{-1.374 \times 10^{-1}} & \multicolumn{1}{c}{-4.568 \times 10^{-2}} \\ 
+\multicolumn{1}{c}{-3.035 \times 10^{-1}} & \multicolumn{1}{c}{-3.052 \times 10^{-3}} & \multicolumn{1}{c}{1.655 \times 10^{0}} \\ 
+\multicolumn{1}{c}{-1.129 \times 10^{-3}}  & \multicolumn{1}{c}{-1.676 \times 10^{0}} & \multicolumn{1}{c}{-2.873 \times 10^{-3}} \\ 
 \end{bmatrix}
 \label{eq:essential_matrix}
 \end{align}
@@ -297,9 +297,9 @@ i. Discuss the process for determining the correct extrinsic matrix. After decom
 
 \begin{align}
 Ext=\begin{bmatrix}
-0.0011 & 0.0012 & 0.0013 \\
-0.0021 & 0.0022 & 0.0023 \\
-0.0031 & 0.0032 & 0.0033 \\
+0.0011 & 0.0012 & 0.0013 \\ 
+0.0021 & 0.0022 & 0.0023 \\ 
+0.0031 & 0.0032 & 0.0033 \\ 
 \end{bmatrix}
 \label{eq:extrinsic_matrix}
 \end{align}
@@ -308,7 +308,7 @@ Ext=\begin{bmatrix}
 The process of determining the correct extrinsic matrix involves decomposing the Essential matrix \(E\) into possible rotation matrices (\(R_1, R_2\)) and a translation vector (\(t\)). Since the Essential matrix only provides relative motion up to a scale, four possible extrinsic matrices can be formed:
 
 \[
-P_2 =
+P_2 = 
 \begin{bmatrix}
 R_1 & t
 \end{bmatrix}, \quad
@@ -422,7 +422,7 @@ This is a very low reprojection error. A low reprojection error means that the e
 
 i. Discuss the program flow you implemented for the main function - what were the steps you took to perform 3d reconstruction in general?
 
-1. Load Data, load the corresponding 2D points from the two images, and load the camera intrinsic matrix.
+1. Load Data, load the corresponding 2D points from the two images, and load the camera intrinsic matrix. 
 
 2. Using the corresponding 2D feature points, compute the fundamental matrix F
 
@@ -443,7 +443,7 @@ Reviewed the structure of the point cloud to confirm it is as expected\\
 Compared to OpenCV output: Plotted point\_cloud from my triangulation as well as OpenCV's version (point\_clou\_cv) to ensure consistency.\\
 
 \hrule
-iii. Replace the image in figure \ref{fig:reconstruction} with a screenshot of your 3d visualization results. Discuss your output - does it look correct to you? Are all of the points in their correct locations? Discuss the accuracy of the point locations and potential sources of error in this representation.
+iii. Replace the image in figure \ref{fig:reconstruction} with a screenshot of your 3d visualization results. Discuss your output - does it look correct to you? Are all of the points in their correct locations? Discuss the accuracy of the point locations and potential sources of error in this representation. 
 It is correct.\\
 But here, I emphasize, a lower error only proves that my triangulation process is consistent with the selected data, but does not mean that the real-world coordinates are necessarily accurate.\\
 The back-projection error only reflects "how much the deviation is between triangulation and projection back to the original 2D point given the data and the estimated model". It can prove that the result is mathematically consistent with the input data, but it cannot absolutely guarantee "correctness in the physical and geometric sense". \\
