@@ -341,5 +341,8 @@ if __name__ == "__main__":
     point_cloud, point_cloud_cv = triangulate_points(E, pts1_normalized, pts2_normalized)
     # comment the previous GUI line to see point cloud visualization.
 
+    errpr = np.linalg.norm(point_cloud - point_cloud_cv)
+    print("Error between custom linear triangulation and cv2.triangulatePoints:", errpr)
+
     visualize(point_cloud)
     # visualize(point_cloud_cv)
