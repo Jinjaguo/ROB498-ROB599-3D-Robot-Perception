@@ -143,7 +143,7 @@ def compute_essential_matrix(K1, K2, F):
     return E
 
 
-def triangulate_points(E, pts1_ep, pts2_ep):
+def triangulate_points(E, pts1_ep, pts2_ep, k_1, k_2):
     """
     Triangulate 3D points from the Essential matrix and corresponding 2D points in two images.
 
@@ -225,6 +225,8 @@ def triangulate_points(E, pts1_ep, pts2_ep):
             best_P2 = P2
             best_points = points_candidate
 
+    print("Best candidate P:")
+    print(best_P2)
     point_cloud = np.array(best_points)  # Nx3
 
     pts1_h = pts1_ep[:, :2].T.astype(np.float32)
@@ -235,11 +237,39 @@ def triangulate_points(E, pts1_ep, pts2_ep):
     pts4D = pts4D / pts4D[3, :]
     point_cloud_cv = pts4D[:3, :].T  # N x 3
 
-    error = np.mean(np.linalg.norm(point_cloud - point_cloud_cv))
-
-    print('error: ', error)
     print("Triangulated 3D points (custom linear triangulation):\n", point_cloud)
     print("Triangulated 3D points (cv2.triangulatePoints):\n", point_cloud_cv)
+
+    P_1 = k_1 @ P1  # (3, 4)
+    P_1_cv = k_1 @ P1_cv
+    P_2 = k_2 @ best_P2  # (3, 4)
+    P_2_cv = k_2 @ P2_cv
+
+    def reprojection_error(point_cloud, P, pts):
+        ones_pc = np.ones((point_cloud.shape[0], 1), dtype=point_cloud.dtype)
+
+        points_3d_h = np.hstack((point_cloud, ones_pc))
+        projected_pc = (P @ points_3d_h.T)  # (3, N)
+        projected_pc = projected_pc.T  # (N, 3)
+        projected_pc_2d = projected_pc[:, :2] / projected_pc[:, 2:]  # (N, 2)
+        diff = projected_pc_2d - pts
+        errors = np.linalg.norm(diff, axis=1)
+        mean_error = np.mean(errors)
+        return mean_error
+
+    mean_error_pc_1 = reprojection_error(point_cloud, P_1, pts1_ep)
+    mean_error_pc_2 = reprojection_error(point_cloud, P_2, pts2_ep)
+    mean_error_pc_cv_1 = reprojection_error(point_cloud_cv, P_1_cv, pts1_ep)
+    mean_error_pc_cv_2 = reprojection_error(point_cloud_cv, P_2_cv, pts2_ep)
+
+    mean_error_pc_1 /= np.max(img1.shape)  # 归一化误差
+    mean_error_pc_2 /= np.max(img2.shape)
+    mean_error_pc_cv_1 /= np.max(img1.shape)
+    mean_error_pc_cv_2 /= np.max(img2.shape)
+
+    print("reprojection error for point cloud: ", np.mean([mean_error_pc_1, mean_error_pc_2]))
+    print("reprojection error for cv point cloud: ", np.mean([mean_error_pc_cv_1, mean_error_pc_cv_2]))
+
     return point_cloud, point_cloud_cv
 
 
@@ -341,11 +371,8 @@ if __name__ == "__main__":
     pts1_normalized = pts1_normalized[:, :2]  # (N, 2)
     pts2_normalized = pts2_normalized[:, :2]  # (N, 2)
 
-    point_cloud, point_cloud_cv = triangulate_points(E, pts1_normalized, pts2_normalized)
+    point_cloud, point_cloud_cv = triangulate_points(E, pts1_normalized, pts2_normalized, K1, K2)
     # comment the previous GUI line to see point cloud visualization.
 
-    errpr = np.linalg.norm(point_cloud - point_cloud_cv)
-    print("Error between custom linear triangulation and cv2.triangulatePoints:", errpr)
-
-    visualize(point_cloud)
+    # visualize(point_cloud)
     # visualize(point_cloud_cv)
