@@ -235,6 +235,9 @@ def triangulate_points(E, pts1_ep, pts2_ep):
     pts4D = pts4D / pts4D[3, :]
     point_cloud_cv = pts4D[:3, :].T  # N x 3
 
+    error = np.mean(np.linalg.norm(point_cloud - point_cloud_cv))
+
+    print('error: ', error)
     print("Triangulated 3D points (custom linear triangulation):\n", point_cloud)
     print("Triangulated 3D points (cv2.triangulatePoints):\n", point_cloud_cv)
     return point_cloud, point_cloud_cv
