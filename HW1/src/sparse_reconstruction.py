@@ -292,6 +292,7 @@ def visualize(point_cloud):
     ax.set_ylabel('Y')
     ax.set_zlabel('Z')
 
+
     # Show the plot
     plt.show()
 
