@@ -257,13 +257,13 @@ def triangulate_points(E, pts1_ep, pts2_ep, k_1, k_2):
         mean_error = np.mean(errors)
         return mean_error
 
-    # mean_error_pc_1 = reprojection_error(point_cloud, P_1, pts1_ep)
-    # mean_error_pc_2 = reprojection_error(point_cloud, P_2, pts2_ep)
+    mean_error_pc_1 = reprojection_error(point_cloud, P_1, pts1_ep)
+    mean_error_pc_2 = reprojection_error(point_cloud, P_2, pts2_ep)
     # mean_error_pc_cv_1 = reprojection_error(point_cloud_cv, P_1_cv, pts1_ep)
     # mean_error_pc_cv_2 = reprojection_error(point_cloud_cv, P_2_cv, pts2_ep)
 
-    # mean_error_pc_1 /= np.max(img1.shape)  # 归一化误差
-    # mean_error_pc_2 /= np.max(img2.shape)
+    mean_error_pc_1 /= np.max(img1.shape)  # 归一化误差
+    mean_error_pc_2 /= np.max(img2.shape)
     # mean_error_pc_cv_1 /= np.max(img1.shape)
     # mean_error_pc_cv_2 /= np.max(img2.shape)
 
