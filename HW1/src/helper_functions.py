@@ -1,11 +1,6 @@
-
-import cv2 as cv
 import numpy as np
-import scipy.optimize
-import numpy.linalg as la
 import matplotlib.pyplot as plt
-import sparse_reconstruction as sub
-
+from HW1.src import sparse_reconstruction as sub
 
 
 def _epipoles(E):
