@@ -259,15 +259,15 @@ def triangulate_points(E, pts1_ep, pts2_ep, k_1, k_2):
 
     mean_error_pc_1 = reprojection_error(point_cloud, P_1, pts1_ep)
     mean_error_pc_2 = reprojection_error(point_cloud, P_2, pts2_ep)
-    # mean_error_pc_cv_1 = reprojection_error(point_cloud_cv, P_1_cv, pts1_ep)
-    # mean_error_pc_cv_2 = reprojection_error(point_cloud_cv, P_2_cv, pts2_ep)
+    mean_error_pc_cv_1 = reprojection_error(point_cloud_cv, P_1_cv, pts1_ep)
+    mean_error_pc_cv_2 = reprojection_error(point_cloud_cv, P_2_cv, pts2_ep)
 
     mean_error_pc_1 /= np.max(img1.shape)  # 归一化误差
     mean_error_pc_2 /= np.max(img2.shape)
     # mean_error_pc_cv_1 /= np.max(img1.shape)
     # mean_error_pc_cv_2 /= np.max(img2.shape)
 
-    # print("reprojection error for point cloud: ", np.mean([mean_error_pc_1, mean_error_pc_2]))
+    print("reprojection error for point cloud: ", np.mean([mean_error_pc_1, mean_error_pc_2]))
     # print("reprojection error for cv point cloud: ", np.mean([mean_error_pc_cv_1, mean_error_pc_cv_2]))
 
     return point_cloud, point_cloud_cv
@@ -371,8 +371,10 @@ if __name__ == "__main__":
     pts1_normalized = pts1_normalized[:, :2]  # (N, 2)
     pts2_normalized = pts2_normalized[:, :2]  # (N, 2)
 
-    point_cloud, point_cloud_cv = triangulate_points(E, pts1_normalized, pts2_normalized, K1, K2)
+    point_cloud, _ = triangulate_points(E, pts1_normalized, pts2_normalized, K1, K2)
+    # save the point cloud to a file
+    np.savez("data/point_cloud.npz", point_cloud=point_cloud)
     # comment the previous GUI line to see point cloud visualization.
 
-    # visualize(point_cloud)
+    visualize(point_cloud)
     # visualize(point_cloud_cv)
