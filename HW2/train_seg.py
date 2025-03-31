@@ -1,15 +1,28 @@
-from pointnet_cls_nn import *
+from pointnet_seg_nn import *
 from data_load import PointCloudDataset
 import torch.optim as optim
 from tqdm import tqdm
 from torch.utils.data import DataLoader
 
-train_path = './data/cls'
+train_path = './data/seg'
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model = PointNetClassification(num_classes=6).to(device)
+model = PointNetSegmentation(num_classes=6).to(device)
 train_dataset = PointCloudDataset(train_path + '/train_data.npy', train_path + '/train_labels.npy')
 train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True, drop_last=True)
+
+
+# from collections import Counter
+#
+# label_counter = Counter()
+#
+# for _, labels in train_loader:
+#     labels = labels.view(-1).tolist()
+#     label_counter.update(labels)
+#
+# print("全训练集类别计数:")
+# for cls, count in sorted(label_counter.items()):
+#     print(f"Class {cls}: {count}")
 
 counts = torch.tensor([208942, 58518, 14729889, 4057856, 8441224, 17303571], dtype=torch.float32)
 freqs = counts / counts.sum()
@@ -49,4 +62,4 @@ for epoch in range(EPOCHS):
     acc = total_correct / total_points
     print(f"Epoch {epoch + 1}, Loss: {avg_loss:.4f}, Accuracy: {acc:.4f}")
 
-torch.save(model.state_dict(), train_path + '/pointnet_cls.pth')
+torch.save(model.state_dict(), train_path + '/pointnet_seg.pth')
