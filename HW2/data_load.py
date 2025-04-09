@@ -19,7 +19,7 @@ def jitter_point_cloud(pc, sigma=0.01, clip=0.05):
 
 class PointCloudDataset(Dataset):
     def __init__(self, data_path, labels_path, train=True):
-        self.data = np.load(data_path).astype(np.float32)  # [B, N, 3]
+        self.data = np.load(data_path).astype(np.float32) # [B, N, 3]
         self.labels = np.load(labels_path).astype(np.int64)  # [B, N]
         self.train = train
 
@@ -37,8 +37,3 @@ class PointCloudDataset(Dataset):
         return pc.astype(np.float32), label
 
 
-import torch
-
-print("CUDA Available:", torch.cuda.is_available())
-print("Current Device:", torch.cuda.current_device())
-print("Device Name:", torch.cuda.get_device_name(0))

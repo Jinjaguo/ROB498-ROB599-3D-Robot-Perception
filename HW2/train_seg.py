@@ -3,8 +3,21 @@ from data_load import PointCloudDataset
 import torch.optim as optim
 from tqdm import tqdm
 from torch.utils.data import DataLoader
+import numpy as np
 
 train_path = './data/seg'
+data = np.load('./data/seg/train_data.npy', allow_pickle=True)
+print("type:", type(data))
+try:
+    print("shape:", data.shape)
+except Exception as e:
+    print("can't access shape:", e)
+
+if isinstance(data, np.ndarray):
+    print("dtype:", data.dtype)
+    if data.dtype == object:
+        print("Looks like it's a list of arrays, not a regular ndarray.")
+
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model = PointNetSegmentation(num_classes=6).to(device)
